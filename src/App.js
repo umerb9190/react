@@ -1,24 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import PostList from "./pages/BlogList";
+import BlogCreate from "./pages/BlogCreate";
+import BlogUpdate from "./pages/BlogUpdate";
+import Login from "./pages/Login";
+import BulkCreate from "./pages/BulkCreate";
+import BlogGetCreate from "./pages/BlogGetCreate";
 
 function App() {
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router> 
+      
+      <Routes>
+        {/* default route */}
+
+        <Route path="/" element={<PostList />} />
+        <Route path="/blog/create" element={<BlogCreate />} />
+        <Route path="/blog/update/:id" element={<BlogUpdate />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/bulk" element={<BulkCreate />} />
+        <Route path="/get" element={<BlogGetCreate />} />
+
+
+      </Routes>
+    </Router>
   );
 }
 
