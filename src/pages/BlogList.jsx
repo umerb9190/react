@@ -2,13 +2,18 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setBlog, deleteBlog } from "../redux/slices/blogs";
 import { useNavigate, Navigate } from "react-router-dom";
+import { httpGet } from "../shared/common";
 
 export default function BlogList() {
   const [loading, setLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
+  
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs.blog);
   const navigate = useNavigate();
+  const { Authenticated } = useSelector((state) => state.auth);
+  // console.log("check ", Authenticated)
+  const token=useSelector((state)=>state.auth.token)
+  // console.log("token1 in bloglist: ", token)
 
   const Handler1 = () => {
     navigate("blog/create");
@@ -24,12 +29,6 @@ export default function BlogList() {
         },
       });
 
-      if (response.status === 401) {
-        localStorage.removeItem("access");
-        setIsAuthenticated(false);
-        return;
-      }
-
       const data = await response.json();
       console.log("delete response ", data);
       dispatch(deleteBlog(id));
@@ -39,36 +38,23 @@ export default function BlogList() {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("access");
-
-    if (!token) {
-      setIsAuthenticated(false);
-      return;
-    }
-
-    setIsAuthenticated(true);
-
+   
     const getPost = async () => {
       try {
         setLoading(true);
 
-        const response = await fetch("http://localhost:8000/blog/", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
+       httpGet("http://localhost:8000/blog/", token)
+        .then((res) => {
+          console.log("Blogs:", res.data);
+           dispatch(setBlog(res.data));
+        })
+        .catch((err) => {
+          console.error(err);
         });
 
-        if (response.status === 401) {
-          localStorage.removeItem("access");
-          setIsAuthenticated(false);
-          return;
-        }
-
-        const data = await response.json();
-        console.log("data ", data);
-        dispatch(setBlog(data));
+      
+       
+        
       } catch (error) {
         console.error("Error fetching blogs:", error);
       } finally {
@@ -80,11 +66,11 @@ export default function BlogList() {
   }, [dispatch]);
 
 
-  if (isAuthenticated === null) {
+  if (Authenticated === null) {
     return <p>Checking authentication...</p>;
   }
 
-  if (!isAuthenticated) {
+  if (!Authenticated) {
     return <Navigate to="/login" replace />;
   }
 
