@@ -1,58 +1,37 @@
-import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { addBlog } from "../redux/slices/blogs";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+// import { addBlog } from "../redux/slices/blogs";
 import { Navigate } from "react-router-dom";
+import { httpPost } from "../shared/common";
 
 export default function BlogCreate() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const dispatch = useDispatch();
+  const {Authenticated}=useSelector((state)=>state.auth);
+  console.log("AUTH in create", Authenticated)
 
-  useEffect(() => {
-    const token = localStorage.getItem("access");
-    if (!token) {
-      setIsAuthenticated(false);
-    } else {
-      setIsAuthenticated(true);
-    }
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const token = localStorage.getItem("access");
-    if (!token) {
-      setIsAuthenticated(false);
-      return;
-    }
-
+    const payload={
+      Post_title:title,
+      Post_content:content
+     }
+   
     try {
-      const response = await fetch("http://localhost:8000/blog/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          Post_title: title,
-          Post_content: content,
-        }),
-      });
-
-      if (response.status === 401) {
-        localStorage.removeItem("access");
-        setIsAuthenticated(false);
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error("Failed to create blog");
-      }
-
-     const data = await response.json();
      
-      console.log("Created",data);
+     console.log("payload: ",payload)
+     httpPost("http://localhost:8000/blog/",token,payload).then((res)=>{
+      console.log("blog created: ", res.data)
+     }).catch((err)=>{
+       console.error("Error fetching blogs:", err);
+
+     })
+  
+     
+      console.log("Blog Created");
 
      
 
@@ -63,11 +42,11 @@ export default function BlogCreate() {
     }
   };
 
-  if (isAuthenticated === null) {
+  if (Authenticated === null) {
     return <p>Checking authentication...</p>;
   }
 
-  if (!isAuthenticated) {
+  if (!Authenticated) {
     return <Navigate to="/login" replace />;
   }
 

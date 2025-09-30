@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setBlog, deleteBlog } from "../redux/slices/blogs";
 import { useNavigate, Navigate } from "react-router-dom";
-import { httpGet } from "../shared/common";
+import { httpDelete, httpGet } from "../shared/common";
 
 export default function BlogList() {
   const [loading, setLoading] = useState(false);
@@ -22,16 +22,12 @@ export default function BlogList() {
   const Handler2 = async (id) => {
     try {
       const token = localStorage.getItem("access");
-      const response = await fetch(`http://localhost:8000/blog/${id}/`, {
-        method: "DELETE",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      });
+      httpDelete(`http://localhost:8000/blog/${id}/`,token).then((res)=>{
+          console.log("blog deleted",res.data)
+      }).catch((err)=>{
+        console.error(err);
+      })
 
-      const data = await response.json();
-      console.log("delete response ", data);
-      dispatch(deleteBlog(id));
     } catch (error) {
       console.error("Delete error:", error);
     }

@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { updateBlog } from "../redux/slices/blogs";
+import { httpPut } from "../shared/common";
 
 export default function BlogUpdate() {
   const dispatch = useDispatch();
@@ -12,7 +13,7 @@ export default function BlogUpdate() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
+    const {Authenticated}=useSelector((state)=>state.auth);
 
 
   useEffect(() => {
@@ -22,46 +23,22 @@ export default function BlogUpdate() {
     }
   }, [blog]);
 
-  useEffect(() => {
-    const token = localStorage.getItem("access");
-    if (!token) {
-      setIsAuthenticated(false);
-    } else {
-      setIsAuthenticated(true);
-    }
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const token = localStorage.getItem("access");
-    if (!token) {
-      setIsAuthenticated(false);
-      return;
-    }
-
     const updated = { ...blog, Post_title: title, Post_content: content };
     console.log("watch ", updated);
 
     try {
-      const response = await fetch(`http://localhost:8000/blog/${id}/`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify(updated),
-      });
+      httpPut(`http://localhost:8000/blog/${id}/`,token,updated).then((res)=>{
+        console.log("updated: ",res.data)
+      }).catch((err)=>{
+       console.error("Error fetching blogs:", err);
+      })
 
-      if (response.status === 401) {
-        localStorage.removeItem("access");
-        setIsAuthenticated(false);
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error("Failed to update blog");
-      }
+      
 
       // const updatedBlog = await response.json();
       // dispatch(updateBlog(updatedBlog));
@@ -70,11 +47,11 @@ export default function BlogUpdate() {
     }
   };
 
-  if (isAuthenticated === null) {
+  if (Authenticated === null) {
     return <p>Checking authentication...</p>;
   }
 
-  if (!isAuthenticated) {
+  if (!Authenticated) {
     return <Navigate to="/login" replace />;
   }
 
