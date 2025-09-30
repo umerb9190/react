@@ -10,10 +10,10 @@ export default function BlogList() {
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs.blog);
   const navigate = useNavigate();
-  const { Authenticated } = useSelector((state) => state.auth);
+  const { Authenticated,token } = useSelector((state) => state.auth);
   // console.log("check ", Authenticated)
-  const token=useSelector((state)=>state.auth.token)
-  // console.log("token1 in bloglist: ", token)
+  
+ 
 
   const Handler1 = () => {
     navigate("blog/create");
@@ -21,7 +21,6 @@ export default function BlogList() {
 
   const Handler2 = async (id) => {
     try {
-      const token = localStorage.getItem("access");
       httpDelete(`http://localhost:8000/blog/${id}/`,token).then((res)=>{
           console.log("blog deleted",res.data)
       }).catch((err)=>{

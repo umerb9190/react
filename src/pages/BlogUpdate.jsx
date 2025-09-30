@@ -13,7 +13,7 @@ export default function BlogUpdate() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-    const {Authenticated}=useSelector((state)=>state.auth);
+    const {Authenticated,token}=useSelector((state)=>state.auth);
 
 
   useEffect(() => {
@@ -26,22 +26,17 @@ export default function BlogUpdate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const token = localStorage.getItem("access");
     const updated = { ...blog, Post_title: title, Post_content: content };
     console.log("watch ", updated);
 
     try {
       httpPut(`http://localhost:8000/blog/${id}/`,token,updated).then((res)=>{
         console.log("updated: ",res.data)
+        dispatch(updateBlog(res.data))
       }).catch((err)=>{
        console.error("Error fetching blogs:", err);
       })
-
-      
-
-      // const updatedBlog = await response.json();
-      // dispatch(updateBlog(updatedBlog));
+     
     } catch (error) {
       console.error("Error updating blog:", error);
     }

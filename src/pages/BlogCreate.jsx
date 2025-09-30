@@ -1,20 +1,21 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
-// import { addBlog } from "../redux/slices/blogs";
+import { useDispatch, useSelector } from "react-redux";
+import { addBlog } from "../redux/slices/blogs";
 import { Navigate } from "react-router-dom";
 import { httpPost } from "../shared/common";
 
 export default function BlogCreate() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const {Authenticated}=useSelector((state)=>state.auth);
-  console.log("AUTH in create", Authenticated)
+  const {Authenticated,token}=useSelector((state)=>state.auth);
+  const dispatch = useDispatch();
+
+  // console.log("AUTH in create", token)
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("access");
     const payload={
       Post_title:title,
       Post_content:content
@@ -25,6 +26,7 @@ export default function BlogCreate() {
      console.log("payload: ",payload)
      httpPost("http://localhost:8000/blog/",token,payload).then((res)=>{
       console.log("blog created: ", res.data)
+      dispatch(addBlog(res.data))
      }).catch((err)=>{
        console.error("Error fetching blogs:", err);
 
