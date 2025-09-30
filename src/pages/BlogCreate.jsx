@@ -1,18 +1,12 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addBlog } from "../redux/slices/blogs";
-import { Navigate } from "react-router-dom";
 import { httpPost } from "../shared/common";
 
 export default function BlogCreate() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const {Authenticated,token}=useSelector((state)=>state.auth);
   const dispatch = useDispatch();
-
-  // console.log("AUTH in create", token)
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -23,17 +17,13 @@ export default function BlogCreate() {
    
     try {
      
-     console.log("payload: ",payload)
-     httpPost("http://localhost:8000/blog/",token,payload).then((res)=>{
-      console.log("blog created: ", res.data)
+     httpPost("http://localhost:8000/blog/",payload).then((res)=>{
       dispatch(addBlog(res.data))
      }).catch((err)=>{
        console.error("Error fetching blogs:", err);
 
      })
-  
-     
-      console.log("Blog Created");
+
 
      
 
@@ -43,14 +33,6 @@ export default function BlogCreate() {
       console.error("Error:", error);
     }
   };
-
-  if (Authenticated === null) {
-    return <p>Checking authentication...</p>;
-  }
-
-  if (!Authenticated) {
-    return <Navigate to="/login" replace />;
-  }
 
   return (
     <form onSubmit={handleSubmit}>

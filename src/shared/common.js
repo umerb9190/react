@@ -1,33 +1,35 @@
 import axios from "axios";
 
 
-export const getHeaders=(token)=>({
+
+const token = localStorage.getItem("access");
+export const getHeaders=()=>({
      "Content-Type": "application/json",
      "Authorization": `Bearer ${token}`,
 });
 
 
-export const httpGet=(url,token)=>{
+export const httpGet=(url,)=>{
     return axios.get(url,{
-        headers:getHeaders(token),
+        headers:getHeaders(),
     })
 }
 
-export const httpPost=(url,token,body)=>{
+export const httpPost=(url,body)=>{
     return axios.post(url,body,{
-         headers:getHeaders(token),
+         headers:getHeaders(),
     })
 }
 
-export const httpPut=(url,token,body)=>{
+export const httpPut=(url,body)=>{
     return axios.put(url,body,{
-        headers:getHeaders(token)
+        headers:getHeaders()
 
     })
 }
-export const httpDelete=(url,token)=>{
+export const httpDelete=(url,)=>{
     return axios.delete(url,{
-        headers:getHeaders(token)
+        headers:getHeaders()
     })
 
 }

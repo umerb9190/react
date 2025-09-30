@@ -13,7 +13,6 @@ export default function BlogUpdate() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-    const {Authenticated,token}=useSelector((state)=>state.auth);
 
 
   useEffect(() => {
@@ -27,11 +26,8 @@ export default function BlogUpdate() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const updated = { ...blog, Post_title: title, Post_content: content };
-    console.log("watch ", updated);
-
     try {
-      httpPut(`http://localhost:8000/blog/${id}/`,token,updated).then((res)=>{
-        console.log("updated: ",res.data)
+      httpPut(`http://localhost:8000/blog/${id}/`,updated).then((res)=>{
         dispatch(updateBlog(res.data))
       }).catch((err)=>{
        console.error("Error fetching blogs:", err);
@@ -42,13 +38,7 @@ export default function BlogUpdate() {
     }
   };
 
-  if (Authenticated === null) {
-    return <p>Checking authentication...</p>;
-  }
-
-  if (!Authenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  
 
   if (!blog) {
     return <p>Blog not found</p>;

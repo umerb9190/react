@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setBlog, deleteBlog } from "../redux/slices/blogs";
+import { setBlog } from "../redux/slices/blogs";
 import { useNavigate, Navigate } from "react-router-dom";
 import { httpDelete, httpGet } from "../shared/common";
 
@@ -10,19 +10,15 @@ export default function BlogList() {
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs.blog);
   const navigate = useNavigate();
-  const { Authenticated,token } = useSelector((state) => state.auth);
-  // console.log("check ", Authenticated)
-  
- 
 
+  
   const Handler1 = () => {
     navigate("blog/create");
   };
 
   const Handler2 = async (id) => {
     try {
-      httpDelete(`http://localhost:8000/blog/${id}/`,token).then((res)=>{
-          console.log("blog deleted",res.data)
+      httpDelete(`http://localhost:8000/blog/${id}/`).then((res)=>{
       }).catch((err)=>{
         console.error(err);
       })
@@ -38,17 +34,14 @@ export default function BlogList() {
       try {
         setLoading(true);
 
-       httpGet("http://localhost:8000/blog/", token)
+       httpGet("http://localhost:8000/blog/")
         .then((res) => {
-          console.log("Blogs:", res.data);
            dispatch(setBlog(res.data));
         })
         .catch((err) => {
           console.error(err);
         });
 
-      
-       
         
       } catch (error) {
         console.error("Error fetching blogs:", error);
@@ -61,13 +54,7 @@ export default function BlogList() {
   }, [dispatch]);
 
 
-  if (Authenticated === null) {
-    return <p>Checking authentication...</p>;
-  }
-
-  if (!Authenticated) {
-    return <Navigate to="/login" replace />;
-  }
+ 
 
   return (
     <div>
