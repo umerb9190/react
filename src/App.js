@@ -5,23 +5,57 @@ import BlogUpdate from "./pages/BlogUpdate";
 import Login from "./pages/Login";
 import BulkCreate from "./pages/BulkCreate";
 import BlogGetCreate from "./pages/BlogGetCreate";
+import ProtectedRoute from "./ProtectedRoutes";
+import BlogList from "./pages/BlogList";
 
 function App() {
-
   return (
-    <Router> 
-      
+    <Router>
       <Routes>
-        {/* default route */}
-
-        <Route path="/" element={<PostList />} />
-        <Route path="/blog/create" element={<BlogCreate />} />
-        <Route path="/blog/update/:id" element={<BlogUpdate />} />
+        {/* Public */}
         <Route path="/login" element={<Login />} />
-        <Route path="/bulk" element={<BulkCreate />} />
-        <Route path="/get" element={<BlogGetCreate />} />
 
-
+        {/* Protected */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <BlogList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/blog/create"
+          element={
+            <ProtectedRoute>
+              <BlogCreate />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/blog/update/:id"
+          element={
+            <ProtectedRoute>
+              <BlogUpdate />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/bulk"
+          element={
+            <ProtectedRoute>
+              <BulkCreate />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/get"
+          element={
+            <ProtectedRoute>
+              <BlogGetCreate />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

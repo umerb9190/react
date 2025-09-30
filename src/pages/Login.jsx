@@ -1,10 +1,16 @@
 import { useState } from "react"
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { setAuth } from "../redux/slices/auth";
+import { store } from "../redux/store";
+
 
 export default function Login(){
     const [userName, setUsername]=useState("")
     const [password, setPassword]=useState("")
     const navigate=useNavigate();
+    const dispatch=useDispatch();
+   
 
     const handleSubmit=async(e)=>{
            e.preventDefault();
@@ -18,9 +24,15 @@ export default function Login(){
         const data=await response.json();
         console.log("data: ",data)
         if (response.ok) {
-        localStorage.setItem("access", data.access);
+       localStorage.setItem("access", data.access);
         localStorage.setItem("refresh", data.refresh);
+
+        const token = localStorage.getItem("access");
+        console.log("token: ", token)
+        dispatch(setAuth(token))  
+        console.log("Redux state after dispatch:", store.getState());
         alert("Login successful!");
+
         navigate("/")
        
       } else {

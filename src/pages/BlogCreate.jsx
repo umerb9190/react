@@ -1,58 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addBlog } from "../redux/slices/blogs";
-import { Navigate } from "react-router-dom";
+import { httpPost } from "../shared/common";
 
 export default function BlogCreate() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    const token = localStorage.getItem("access");
-    if (!token) {
-      setIsAuthenticated(false);
-    } else {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("access");
-    if (!token) {
-      setIsAuthenticated(false);
-      return;
-    }
-
+    const payload={
+      Post_title:title,
+      Post_content:content
+     }
+   
     try {
-      const response = await fetch("http://localhost:8000/blog/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          Post_title: title,
-          Post_content: content,
-        }),
-      });
-
-      if (response.status === 401) {
-        localStorage.removeItem("access");
-        setIsAuthenticated(false);
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error("Failed to create blog");
-      }
-
-     const data = await response.json();
      
-      console.log("Created",data);
+     httpPost("http://localhost:8000/blog/",payload).then((res)=>{
+      dispatch(addBlog(res.data))
+     }).catch((err)=>{
+       console.error("Error fetching blogs:", err);
+
+     })
+
 
      
 
@@ -62,14 +33,6 @@ export default function BlogCreate() {
       console.error("Error:", error);
     }
   };
-
-  if (isAuthenticated === null) {
-    return <p>Checking authentication...</p>;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
 
   return (
     <form onSubmit={handleSubmit}>
